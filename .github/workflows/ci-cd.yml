@@ -1,41 +1,28 @@
-name: CI/CD Pipeline
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Node.js
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Install dependencies (Root Project)
+        run: |
+          cd ai-ci-cd-debugger  # Ensure correct directory
+          npm install
 
-      - name: Build Project
-        run: npm run build
+      - name: Install dependencies (Backend Functions)
+        run: |
+          cd ai-ci-cd-debugger/backend/functions
+          npm install
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v20
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.prj_qApPcNVqdRoUfhhshJW10cZIVV6c}}
+      - name: Build project
+        run: |
+          cd ai-ci-cd-debugger
+          npm run build
